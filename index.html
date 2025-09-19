@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HSgB Pharmacy Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- General Setup & Theme --- */
+        :root {
+            --maroon: #800000;
+            --light-grey: #f0f0f0;
+            --dark-grey: #a9a9a9;
+            --text-color: #333;
+            --white: #ffffff;
+            --border-color: #ddd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--white);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--maroon);
+            color: var(--white);
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        header .icon {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-right: 20px;
+        }
+
+        header .title-group h1 {
+            font-size: 1.8em;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        header .title-group p {
+            font-size: 0.9em;
+            margin: 0;
+            font-weight: 400;
+            color: var(--light-grey);
+        }
+
+        /* --- Page Structure --- */
+        .page {
+            display: none; /* Hide all pages by default */
+        }
+
+        .page.active {
+            display: block; /* Show only the active page */
+        }
+        
+        h2 {
+            margin-bottom: 5px;
+            color: var(--maroon);
+        }
+        
+        h3 {
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--light-grey);
+            padding-bottom: 5px;
+        }
+
+        /* --- Navigation & Buttons --- */
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1em;
+            font-weight: 600;
+        }
+
+        .btn-back {
+            background-color: var(--dark-grey);
+            color: var(--white);
+        }
+
+        .btn-clear {
+            background-color: #f44336;
+            color: var(--white);
+        }
+
+        /* --- Main Menu --- */
+        #main-menu p {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .calculator-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .calculator-list li {
+            background-color: var(--light-grey);
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        
+        .calculator-list li:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .calculator-list a {
+            display: block;
+            padding: 20px;
+            text-decoration: none;
+            color: var(--maroon);
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .calculator-list .footnote {
+            display: block;
+            color: var(--text-color);
+            font-weight: 400;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        /* --- Form Elements --- */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1em;
+        }
+        
+        .form-group select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 0.65rem auto;
+        }
+
+        /* --- Footnotes & Helpers --- */
+        .footnote, .sub-footnote {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .shaded-box {
+            background-color: var(--light-grey);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 0.8em;
+        }
+
+        .hidden {
+            display: none;
+        }
+        
+        .link {
+            color: var(--maroon);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* --- Output/Results Styling --- */
+        .results-section {
+            margin-top: 30px;
+        }
+
+        .result-box {
+            background-color: var(--light-grey);
+            border: 2px solid var(--maroon);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .result-box-multiple {
+            background-color: #fff;
+            border: 2px solid var(--maroon);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .result-box h3, .result-box-multiple h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--maroon);
+        }
+
+        .result-value {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        
+        .result-box-multiple .result-value {
+             font-size: 1.8em;
+        }
+
+        .result-unit {
+            font-size: 1em;
+            font-weight: 400;
+            margin-left: 5px;
+        }
+        
+        .sub-result-card {
+            background-color: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sub-result-card p {
+            margin: 0;
+        }
+        
+        .sub-result-card .label {
+            font-weight: 600;
+        }
+
+        .sub-result-card .value {
+            text-align: right;
+        }
+        
+        /* --- Clexane Specific Styling --- */
+        .clexane-output-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .clexane-output-table td {
+            padding: 8px 4px;
+            border-bottom: 1px solid var(--light-grey);
+        }
+        .clexane-output-table .weight-band {
+            font-weight: 600;
+            width: 30%;
+        }
+        .clexane-output-table .dimmed {
+            color: #999;
+        }
+        .clexane-output-table strong {
+            color: var(--text-color);
+        }
+        .clexane-output-table .dose-footnote {
+            font-size: 0.8em;
+            color: #555;
+            padding-left: 10px;
+            display: block;
+        }
+
+        /* --- Formula & Disclaimer --- */
+        .formula-box {
+            margin-top: 30px;
+            padding: 15px;
+            border: 1px dashed var(--dark-grey);
+            border-radius: 5px;
+            background-color: #fafafa;
+            font-family: monospace;
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        footer p {
+            margin-bottom: 8px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header id="header">
+        <div class="icon">HSgB</div>
+        <div class="title-group">
+            <h1>Hospital Sungai Buloh Pharmacy Calculator</h1>
+            <p>Quick dosing & weight calculators for hospital staff</p>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <main id="main-menu" class="page active">
+            <h2>Available calculators</h2>
+            <p>Select a calculator below. The title/header is clickable to return here.</p>
+            <ul class="calculator-list">
+                <li>
+                    <a href="#" class="page-link" data-page="cosmofer-calc">
+                        Iron Dextran (Cosmofer) Dose Calculator
+                        <span class="footnote">Calculate total iron dose and final dosing recommendation</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="page-link" data-page="bw-calc">
+                        Body Weight (BW) Calculator
+                        <span class="footnote">BMI, BSA, IBW (Devine) & Adjusted BW</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="page-link" data-page="crcl-calc">
+                        Renal Function (CrCl) Calculator
+                        <span class="footnote">Cockcroft-Gault-based creatinine clearance</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="page-link" data-page="clexane-calc">
+                        Enoxaparin (Clexane) Dose Calculator
+                        <span class="footnote">Dose guide per indication and weight bands with renal adjustment</span>
+                    </a>
+                </li>
+            </ul>
+        </main>
+
+        <main id="cosmofer-calc" class="page">
+            <div class="nav-buttons">
+                <button class="btn btn-back">BACK</button>
+                <button class="btn btn-clear" data-form="cosmofer-form">CLEAR</button>
+            </div>
+            <h2>Iron Dextran (Cosmofer) Dose Calculator</h2>
+            
+            <form id="cosmofer-form">
+                <div class="form-group">
+                    <label for="cosmofer-indication">Indication</label>
+                    <select id="cosmofer-indication">
+                        <option value="" selected disabled>Select an indication...</option>
+                        <option value="blood_loss">Blood loss, Eg: During labour</option>
+                        <option value="ida">Iron Deficiency Anaemia (IDA)</option>
+                    </select>
+                    <p class="footnote hidden" id="cosmofer-ida-footnote">Additional dose: 500 mg</p>
+                </div>
+                <div class="form-group">
+                    <label for="cosmofer-bw">Body Weight (kg)</label>
+                    <input type="number" id="cosmofer-bw" placeholder="Enter body weight in kg">
+                    <div class="shaded-box">
+                       i) In pregnancy, use pre-pregnancy body weight.<br>
+                       ii) In obese patients (BMI > 30kg/m2), use <a href="#" class="link page-link" data-page="bw-calc">Ideal Body Weight (IBW)</a>.
+                    </div>
+                </div>
+                 <div class="form-group">
+                    <label for="cosmofer-target-hb">Target Hb (g/dL)</label>
+                    <input type="number" id="cosmofer-target-hb" placeholder="Enter target haemoglobin">
+                </div>
+                 <div class="form-group">
+                    <label for="cosmofer-current-hb">Current Hb (g/dL)</label>
+                    <input type="number" id="cosmofer-current-hb" placeholder="Enter current haemoglobin">
+                </div>
+            </form>
+            
+            <div class="results-section" id="cosmofer-results">
+                 <div class="sub-result-card">
+                    <p class="label">Calculated dose (mg)</p>
+                    <p class="value" id="cosmofer-calculated-dose">--</p>
+                </div>
+                <p class="footnote hidden" id="cosmofer-ida-added-footnote">additional dose 500 mg added for IDA</p>
+
+                <div class="result-box">
+                    <h3>Final Dose of Cosmofer (Test Dose Included)</h3>
+                    <span class="result-value" id="cosmofer-final-dose">--</span><span class="result-unit">mg</span>
+                    <p class="footnote" style="text-align: center; margin-top: 10px;">*Dose rounded to the nearest 100 mg</p>
+                </div>
+
+                <div class="sub-result-card">
+                    <p class="label">Dose per Body Weight (mg/kg)</p>
+                    <p class="value" id="cosmofer-dose-per-bw">--</p>
+                </div>
+
+                <div class="sub-result-card">
+                    <p class="label">Remarks</p>
+                    <p class="value" id="cosmofer-remarks">--</p>
+                </div>
+            </div>
+
+            <p style="margin-top: 30px;"><a href="https://drive.google.com/file/d/1EjZOkMmgV2bRYdxenEfAlQm6cX5qI9RE/view?usp=sharing" target="_blank" class="link">🔗 Refer to PRIC Newsletter (Cosmofer Quick Guide)</a></p>
+
+            <div class="formula-box">
+                Calculated dose (mg) = Body Weight (kg) &times; (Target Hb - Current Hb) &times; 2.4
+                <br>
+                <span class="sub-footnote">Note: For IDA, 500 mg has been added to the calculated dose.</span>
+            </div>
+        </main>
+        
+        <main id="bw-calc" class="page">
+            <div class="nav-buttons">
+                <button class="btn btn-back">BACK</button>
+                <button class="btn btn-clear" data-form="bw-form">CLEAR</button>
+            </div>
+            <h2>Body Weight Calculator</h2>
+
+            <form id="bw-form">
+                <div class="form-group">
+                    <label for="bw-weight">Actual Body Weight (kg)</label>
+                    <input type="number" id="bw-weight" placeholder="Enter weight in kg">
+                </div>
+                <div class="form-group">
+                    <label for="bw-height">Height (cm)</label>
+                    <input type="number" id="bw-height" placeholder="Enter height in cm">
+                </div>
+                <div class="form-group">
+                    <label for="bw-gender">Gender</label>
+                    <select id="bw-gender">
+                        <option value="" selected disabled>Select gender (optional)...</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                    <p class="footnote">*optional, and required only for the Ideal Body Weight & Adjusted Body Weight calculation.</p>
+                </div>
+            </form>
+
+            <div class="results-section" id="bw-results">
+                <div class="result-box-multiple">
+                    <h3>Body Mass Index (BMI)</h3>
+                    <span class="result-value" id="bw-bmi">--</span><span class="result-unit">kg/m²</span>
+                </div>
+                <div class="result-box-multiple">
+                    <h3>Body Surface Area (BSA)</h3>
+                    <span class="result-value" id="bw-bsa">--</span><span class="result-unit">m²</span>
+                </div>
+                <div class="result-box-multiple">
+                    <h3>Ideal Body Weight (IBW)</h3>
+                    <span class="result-value" id="bw-ibw">--</span><span class="result-unit">kg</span>
+                </div>
+                <div class="result-box-multiple">
+                    <h3>Adjusted Body Weight (AdjBW)</h3>
+                    <span class="result-value" id="bw-adjbw">--</span><span class="result-unit">kg</span>
+                </div>
+            </div>
+
+            <div class="formula-box">
+                BMI (kg/m²) = Weight (kg) / [Height (m)]²<br>
+                BSA (m²) = √([Height (cm) × Weight (kg)] / 3600)<br>
+                IBW (kg, Devine) = Men: 50kg + 0.9kg × (Height cm - 152) | Women: 45.5kg + 0.9kg × (Height cm - 152)<br>
+                AdjBW (kg) = IBW + 0.4 × (Actual Weight - IBW)
+            </div>
+        </main>
+        
+        <main id="crcl-calc" class="page">
+            <div class="nav-buttons">
+                <button class="btn btn-back">BACK</button>
+                <button class="btn btn-clear" data-form="crcl-form">CLEAR</button>
+            </div>
+            <h2>Renal Function Calculator (CrCl)</h2>
+            
+            <form id="crcl-form">
+                <div class="form-group">
+                    <label for="crcl-age">Age (years)</label>
+                    <input type="number" id="crcl-age" placeholder="Enter age in years">
+                </div>
+                <div class="form-group">
+                    <label for="crcl-bw">Body Weight (kg)</label>
+                    <input type="number" id="crcl-bw" placeholder="Enter body weight in kg">
+                    <div class="shaded-box">
+                       For obese patients, use <a href="#" class="link page-link" data-page="bw-calc">Adjusted Body Weight (AdjBW)</a>.
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="crcl-gender">Gender</label>
+                    <select id="crcl-gender">
+                        <option value="" selected disabled>Select gender...</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="crcl-scr">Serum Creatinine (SCr) (μmol/L)</label>
+                    <input type="number" id="crcl-scr" placeholder="Enter serum creatinine">
+                </div>
+            </form>
+            
+            <div class="results-section" id="crcl-results">
+                 <div class="result-box">
+                    <h3>Creatinine Clearance (CrCl)</h3>
+                    <span class="result-value" id="crcl-value">--</span><span class="result-unit">ml/min</span>
+                </div>
+            </div>
+            
+            <div class="formula-box">
+                CrCl (ml/min) = [(140 - Age) &times; Body Weight (kg) &times; F] / Serum Creatinine (μmol/L)<br>
+                <span class="sub-footnote">F = 1.23 for males, 1.04 for females.</span><br>
+                <span class="sub-footnote">Based on the Cockcroft-Gault equation.</span>
+            </div>
+        </main>
+
+        <main id="clexane-calc" class="page">
+            <div class="nav-buttons">
+                <button class="btn btn-back">BACK</button>
+                <button class="btn btn-clear" data-form="clexane-form">CLEAR</button>
+            </div>
+            <h2>Enoxaparin (Clexane) Dose Calculator</h2>
+            
+            <form id="clexane-form">
+                 <div class="form-group">
+                    <label for="clexane-indication">Indication</label>
+                    <select id="clexane-indication">
+                        <option value="" selected disabled>Select an indication...</option>
+                        <option value="preg">Thromboprophylaxis for Pregnant Women</option>
+                        <option value="vte_med">VTE Prophylaxis in Medical Patients or Non-major Orthopaedic Surgery Patients</option>
+                        <option value="vte_ortho">VTE Prophylaxis in Orthopaedic Surgery Patients with Total Hip or Knee Arthroplasty or Hip Fracture Surgery</option>
+                        <option value="dvt_pe">DVT or PE Treatment</option>
+                        <option value="acs">ACS Treatment</option>
+                    </select>
+                     <p class="footnote hidden" id="clexane-dvt-pe-footnote">S/C Clexane Dose: 1 mg/kg BD</p>
+                     <p class="footnote hidden" id="clexane-acs-footnote">S/C Clexane Dose: 1 mg/kg BD</p>
+                </div>
+                <div class="form-group">
+                    <label for="clexane-bw">Body Weight (kg)</label>
+                    <input type="number" id="clexane-bw" placeholder="Enter body weight in kg">
+                    <p class="footnote hidden" id="clexane-weight-range-preg">Weight range: &lt;50 kg, 50-90 kg, 91-130 kg, 131-170 kg, &gt; 170kg</p>
+                    <p class="footnote hidden" id="clexane-weight-range-other">Weight range: &lt;40 kg, 50-69 kg, 70-99 kg, 100-120 kg, &gt; 120 kg or <a href="#" class="link page-link" data-page="bw-calc">BMI</a> ≥ 40 kg/m²</p>
+                </div>
+            </form>
+
+            <div class="results-section">
+                <div class="result-box-multiple">
+                    <h3>Suggested dose for Normal Renal Function</h3>
+                    <div id="clexane-normal-dose">
+                        <p style="color: #666;">Select an indication and enter body weight to see results.</p>
+                    </div>
+                </div>
+                 <div class="result-box-multiple">
+                    <h3>Suggested Renal Adjusted Dose for CrCl 15-30 ml/min</h3>
+                    <div id="clexane-renal-dose">
+                        <p style="color: #666;">Select an indication and enter body weight to see results.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Prepared by: Izyana Munirah Idham (AMS Pharmacist), Hospital Sungai Buloh.</p>
+            <p>Updated: September 2025.</p>
+            <p><strong>For Hosp Sungai Buloh Staff Use Only.</strong></p>
+            <p class="footnote">This guide/calculator provides general advice based on published evidence and expert opinion for standardisation of practice in HSgB. This guide may not cover all aspects of clinical practice, thus healthcare practitioners are encouraged to review patient details and professionally assess the relevance of this guide to each clinical situation. This guide is subject to periodic updates. We assume no responsibility for any party that referred to an outdated version.</p>
+        </footer>
+
+    </div> <script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const pages = document.querySelectorAll('.page');
+    const pageLinks = document.querySelectorAll('.page-link');
+    const header = document.getElementById('header');
+    const backButtons = document.querySelectorAll('.btn-back');
+    const clearButtons = document.querySelectorAll('.btn-clear');
+    let lastActivePage = 'main-menu';
+
+    // --- Page Navigation ---
+    function showPage(pageId) {
+        // Store the current page before navigating away, unless it's the main menu
+        const currentPage = document.querySelector('.page.active');
+        if (currentPage && currentPage.id !== 'main-menu') {
+            lastActivePage = currentPage.id;
+        }
+
+        pages.forEach(page => {
+            page.classList.remove('active');
+        });
+        const newPage = document.getElementById(pageId);
+        if (newPage) {
+            newPage.classList.add('active');
+            window.scrollTo(0, 0);
+        }
+    }
+
+    pageLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage(e.currentTarget.dataset.page);
+        });
+    });
+
+    header.addEventListener('click', () => showPage('main-menu'));
+
+    backButtons.forEach(button => {
+        button.addEventListener('click', () => showPage('main-menu'));
+    });
+
+    // --- Clear Buttons ---
+    clearButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            const formId = e.currentTarget.dataset.form;
+            const form = document.getElementById(formId);
+            if (form) {
+                form.reset();
+                // Trigger input event on all inputs to re-run calculation and clear results
+                form.querySelectorAll('input, select').forEach(input => {
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                });
+            }
+        });
+    });
+
+    // --- Calculator Logic ---
+
+    // 1. Cosmofer Calculator
+    const cosmoferForm = document.getElementById('cosmofer-form');
+    if (cosmoferForm) {
+        cosmoferForm.addEventListener('input', calculateCosmofer);
+    }
+
+    function calculateCosmofer() {
+        const indication = document.getElementById('cosmofer-indication').value;
+        const bw = parseFloat(document.getElementById('cosmofer-bw').value);
+        const targetHb = parseFloat(document.getElementById('cosmofer-target-hb').value);
+        const currentHb = parseFloat(document.getElementById('cosmofer-current-hb').value);
+
+        // Show/hide IDA footnotes
+        document.getElementById('cosmofer-ida-footnote').classList.toggle('hidden', indication !== 'ida');
+        document.getElementById('cosmofer-ida-added-footnote').classList.toggle('hidden', indication !== 'ida');
+
+        if (!indication || !bw || !targetHb || !currentHb || bw <= 0 || targetHb < currentHb) {
+            document.getElementById('cosmofer-calculated-dose').textContent = '--';
+            document.getElementById('cosmofer-final-dose').textContent = '--';
+            document.getElementById('cosmofer-dose-per-bw').textContent = '--';
+            document.getElementById('cosmofer-remarks').textContent = '--';
+            return;
+        }
+        
+        let calculatedDose = bw * (targetHb - currentHb) * 2.4;
+        if (indication === 'ida') {
+            calculatedDose += 500;
+        }
+        
+        const finalDose = Math.round(calculatedDose / 100) * 100;
+        const dosePerBw = finalDose / bw;
+        
+        let remarks = '--';
+        if (dosePerBw <= 20) {
+            remarks = 'Dose is ≤ 20 mg/kg - may be administered as a single dose';
+        } else {
+            remarks = 'Dose is > 20 mg/kg, suggest to administer 20 mg/kg in the 1st infusion, then the remainder in the 2nd infusion';
+        }
+
+        document.getElementById('cosmofer-calculated-dose').textContent = calculatedDose.toFixed(1);
+        document.getElementById('cosmofer-final-dose').textContent = finalDose;
+        document.getElementById('cosmofer-dose-per-bw').textContent = dosePerBw.toFixed(2);
+        document.getElementById('cosmofer-remarks').textContent = remarks;
+    }
+
+    // 2. Body Weight Calculator
+    const bwForm = document.getElementById('bw-form');
+    if (bwForm) {
+        bwForm.addEventListener('input', calculateBw);
+    }
+
+    function calculateBw() {
+        const weight = parseFloat(document.getElementById('bw-weight').value);
+        const height = parseFloat(document.getElementById('bw-height').value);
+        const gender = document.getElementById('bw-gender').value;
+
+        const bmiEl = document.getElementById('bw-bmi');
+        const bsaEl = document.getElementById('bw-bsa');
+        const ibwEl = document.getElementById('bw-ibw');
+        const adjbwEl = document.getElementById('bw-adjbw');
+
+        // Reset all
+        bmiEl.textContent = '--';
+        bsaEl.textContent = '--';
+        ibwEl.textContent = '--';
+        adjbwEl.textContent = '--';
+
+        if (weight > 0 && height > 0) {
+            const heightM = height / 100;
+            const bmi = weight / (heightM * heightM);
+            const bsa = Math.sqrt((height * weight) / 3600);
+            bmiEl.textContent = bmi.toFixed(2);
+            bsaEl.textContent = bsa.toFixed(2);
+
+            if (gender) {
+                let ibw;
+                if (gender === 'male') {
+                    ibw = 50 + 0.9 * (height - 152);
+                } else { // female
+                    ibw = 45.5 + 0.9 * (height - 152);
+                }
+                ibw = Math.max(0, ibw); // IBW should not be negative
+                ibwEl.textContent = ibw.toFixed(1);
+
+                if (weight > ibw) {
+                    const adjbw = ibw + 0.4 * (weight - ibw);
+                    adjbwEl.textContent = adjbw.toFixed(1);
+                } else {
+                    adjbwEl.textContent = 'N/A';
+                }
+            }
+        }
+    }
+
+    // 3. CrCl Calculator
+    const crclForm = document.getElementById('crcl-form');
+    if (crclForm) {
+        crclForm.addEventListener('input', calculateCrcl);
+    }
+
+    function calculateCrcl() {
+        const age = parseFloat(document.getElementById('crcl-age').value);
+        const bw = parseFloat(document.getElementById('crcl-bw').value);
+        const gender = document.getElementById('crcl-gender').value;
+        const scr = parseFloat(document.getElementById('crcl-scr').value);
+
+        const crclValueEl = document.getElementById('crcl-value');
+        crclValueEl.textContent = '--';
+
+        if (age > 0 && bw > 0 && gender && scr > 0) {
+            const F = (gender === 'male') ? 1.23 : 1.04;
+            const crcl = ((140 - age) * bw * F) / scr;
+            crclValueEl.textContent = crcl.toFixed(1);
+        }
+    }
+    
+    // 4. Clexane Calculator
+    const clexaneForm = document.getElementById('clexane-form');
+    if (clexaneForm) {
+        clexaneForm.addEventListener('input', updateClexane);
+    }
+
+    const clexaneDoses = {
+        preg: {
+            normal: [
+                { range: [0, 49.9], text: 'S/C Clexane 20 mg OD' },
+                { range: [50, 90], text: 'S/C Clexane 40 mg OD' },
+                { range: [91, 130], text: 'S/C Clexane 60 mg OD' },
+                { range: [131, 170], text: 'S/C Clexane 80 mg OD' },
+                { range: [170.1, Infinity], text: 'S/C Clexane 0.6 mg/kg/day' }
+            ],
+            renal: [
+                { range: [0, 49.9], text: 'Consider 50% of the standard dose' },
+                { range: [50, 90], text: 'S/C Clexane 20 mg OD' },
+                { range: [91, 130], text: 'S/C Clexane 30 mg OD' },
+                { range: [131, 170], text: 'S/C Clexane 40 mg OD' },
+                { range: [170.1, Infinity], text: 'Consider 50% of the standard dose' }
+            ],
+            weightBands: ['<50 kg', '50-90 kg', '91-130 kg', '131-170 kg', '> 170kg']
+        },
+        vte_med: {
+            normal: [
+                { range: [0, 39.9], text: 'No recommendation' },
+                { range: [40, Infinity], text: 'S/C Clexane 40 mg OD' }
+            ],
+            renal: [
+                { range: [0, 39.9], text: 'No recommendation' },
+                { range: [40, Infinity], text: 'S/C Clexane 20 mg OD' }
+            ],
+            weightBands: ['< 40 kg', '≥ 40 kg']
+        },
+        vte_ortho: {
+            normal: [
+                { range: [0, 39.9], text: 'No recommendation' },
+                { range: [40, Infinity], text: 'S/C Clexane 40-60 mg OD' }
+            ],
+            renal: [
+                { range: [0, 39.9], text: 'No recommendation' },
+                { range: [40, Infinity], text: 'S/C Clexane 20-30 mg OD' }
+            ],
+            weightBands: ['< 40 kg', '≥ 40 kg']
+        },
+        dvt_pe: {
+             normal: [
+                { range: [0, 39.9], text: 'S/C Clexane 20-40 mg BD', note: 'Consider changing to S/C Fondaparinux 5 mg OD' },
+                { range: [40, 49.9], text: 'S/C Clexane 40 mg BD', note: 'Consider changing to S/C Fondaparinux 5 mg OD' },
+                { range: [50, 69.9], text: 'S/C Clexane 60 mg BD', note: 'Consider changing to S/C Fondaparinux 7.5 mg OD' },
+                { range: [70, 99.9], text: 'S/C Clexane 80 mg BD', note: 'Consider changing to S/C Fondaparinux 7.5 mg OD' },
+                { range: [100, 120], text: 'S/C Clexane 100-120 mg BD', note: 'Consider changing to S/C Fondaparinux 10 mg OD' },
+                { range: [120.1, Infinity], text: 'S/C Clexane 0.75 mg/kg BD (up to 160 mg BD)', note: 'Consider changing to S/C Fondaparinux 10 mg OD' },
+            ],
+            renal: [
+                { range: [0, 39.9], text: 'Consider 50% of the standard dose' },
+                { range: [40, 49.9], text: 'S/C Clexane 40 mg OD' },
+                { range: [50, 69.9], text: 'S/C Clexane 60 mg OD' },
+                { range: [70, 99.9], text: 'S/C Clexane 80 mg OD' },
+                { range: [100, 120], text: 'S/C Clexane 80-120 mg BD' },
+                { range: [120.1, Infinity], text: 'S/C Clexane 0.75 mg/kg OD (up to 160 mg OD)' },
+            ],
+            weightBands: ['<40 kg', '40-49 kg', '50-69 kg', '70-99 kg', '100-120 kg', 'BMI ≥40 kg/m²']
+        },
+        acs: {
+             normal: [
+                { range: [0, 39.9], text: 'S/C Clexane 20-40 mg BD' },
+                { range: [40, 49.9], text: 'S/C Clexane 40 mg BD' },
+                { range: [50, 69.9], text: 'S/C Clexane 60 mg BD', note: 'Consider changing to S/C Fondaparinux 2.5 mg OD' },
+                { range: [70, 99.9], text: 'S/C Clexane 80 mg BD', note: 'Consider changing to S/C Fondaparinux 2.5 mg OD' },
+                { range: [100, 120], text: 'S/C Clexane 100-120 mg BD', note: 'Consider changing to S/C Fondaparinux 2.5 mg OD' },
+                { range: [120.1, Infinity], text: 'S/C Clexane 0.75 mg/kg BD (up to 160 mg BD)', note: 'Consider changing to S/C Fondaparinux 2.5 mg OD' },
+            ],
+            renal: [
+                { range: [0, 39.9], text: 'Consider 50% of the standard dose' },
+                { range: [40, 49.9], text: 'S/C Clexane 40 mg OD' },
+                { range: [50, 69.9], text: 'S/C Clexane 60 mg OD' },
+                { range: [70, 99.9], text: 'S/C Clexane 80 mg OD' },
+                { range: [100, 120], text: 'S/C Clexane 80-120 mg BD' },
+                { range: [120.1, Infinity], text: 'S/C Clexane 0.75 mg/kg OD (up to 160 mg OD)' },
+            ],
+             weightBands: ['<40 kg', '40-49 kg', '50-69 kg', '70-99 kg', '100-120 kg', 'BMI ≥40 kg/m²']
+        }
+    };
+    
+    function generateDoseTable(doseArray, weightBands, weight) {
+        let html = '<table class="clexane-output-table">';
+        doseArray.forEach((item, index) => {
+            const isHighlighted = (weight >= item.range[0] && weight <= item.range[1]);
+            const wrapperStart = isHighlighted ? '<strong>' : '<span class="dimmed">';
+            const wrapperEnd = isHighlighted ? '</strong>' : '</span>';
+            const noteHtml = item.note ? `<span class="dose-footnote">${item.note}</span>` : '';
+            
+            html += `
+                <tr>
+                    <td class="weight-band">${wrapperStart}${weightBands[index]}${wrapperEnd}</td>
+                    <td>${wrapperStart}${item.text}${noteHtml}${wrapperEnd}</td>
+                </tr>
+            `;
+        });
+        html += '</table>';
+        return html;
+    }
+
+    function updateClexane() {
+        const indication = document.getElementById('clexane-indication').value;
+        const bw = parseFloat(document.getElementById('clexane-bw').value);
+        
+        // Dynamic footnotes
+        document.getElementById('clexane-dvt-pe-footnote').classList.toggle('hidden', indication !== 'dvt_pe');
+        document.getElementById('clexane-acs-footnote').classList.toggle('hidden', indication !== 'acs');
+        document.getElementById('clexane-weight-range-preg').classList.toggle('hidden', indication !== 'preg');
+        document.getElementById('clexane-weight-range-other').classList.toggle('hidden', !['vte_med', 'vte_ortho', 'dvt_pe', 'acs'].includes(indication));
+
+        const normalDoseEl = document.getElementById('clexane-normal-dose');
+        const renalDoseEl = document.getElementById('clexane-renal-dose');
+
+        if (!indication) {
+            const placeholder = '<p style="color: #666;">Select an indication to see results.</p>';
+            normalDoseEl.innerHTML = placeholder;
+            renalDoseEl.innerHTML = placeholder;
+            return;
+        }
+
+        const data = clexaneDoses[indication];
+        normalDoseEl.innerHTML = generateDoseTable(data.normal, data.weightBands, bw || -1);
+        renalDoseEl.innerHTML = generateDoseTable(data.renal, data.weightBands, bw || -1);
+    }
+});
+</script>
+
+</body>
+</html>
