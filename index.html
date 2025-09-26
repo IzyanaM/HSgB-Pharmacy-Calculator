@@ -116,12 +116,13 @@
             background-color: #6a0000;
         }
 
-        .page {
+        .page, .disclaimer  {
             display: none;
             background-color: var(--white);
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             max-width: 900px;
+            width: 90%;
             margin: 20px auto;
             padding: 8px 20px 20px 20px;
         }
@@ -130,10 +131,13 @@
             display: block;
         }
 
-        @media (max-width: 960px) {
-            .page {
-                    max-width: 90%; /* Responsive width for smaller screens */
-            }
+        .disclaimer {
+            font-size: 0.85em;
+            color: #555;
+        }
+
+        .disclaimer b {
+            color: #000;
         }
 
         h2 {
@@ -300,18 +304,19 @@
         }
 
         .disclaimer-section {
-            background-color: var(--white);
+            font-size: 0.8em;            
+            color: #555;            
+            background-color: var(--light-grey);
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);           
-            padding: 20px;
-            font-size: 0.8em;
-            color: #666;
-            max-width: 90%;
-            margin: 20px auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            max-width: 900px
+            width: 90%;
+            margin: 20px auto;           
+            padding: 6px;
         }
 
-        .disclaimer-section p {
-            margin: 5px 0;
+        .disclaimer-section b {
+            color: #000;
         }
 
         .disclaimer-section p.bold {
@@ -363,6 +368,14 @@
             font-size: 0.8em;
             color: #555;
             background-color: var(--light-grey);
+        }
+
+        .stronger-bold {
+            font-weight: 700;
+        }
+
+        .less-bold {
+            font-weight: 600;
         }
     </style>
 </head>
@@ -665,10 +678,9 @@
         </p>
     </div>
 
-    <div class="disclaimer-section">
-        <p>Prepared by: Izyana Munirah Idham (AMS Pharmacist), Hospital Sungai Buloh.</p>
-        <p>Updated: September 2025.</p>
-        <p class="bold">For Hosp Sungai Buloh Staff Use Only.</p>
+    <div id="disclaimer-template" class="disclaimer-section">
+        <p><span class="less-bold">Prepared by:</span> Izyana Munirah Idham (AMS Pharmacist), Hospital Sungai Buloh.<br><span class="less-bold">Updated: </span> September 2025.</p>
+        <p class="stronger-bold">For Hosp Sungai Buloh Staff Use Only.</p>
         <p class="footnote">
             This guide/calculator provides general advice based on published evidence and expert opinion for standardisation of practice in HSgB. This guide may not cover all aspects of clinical practice, thus healthcare practitioners are encouraged to review patient details and professionally assess the relevance of this guide to each clinical situation. This guide is subject to periodic updates. We assume no responsibility for any party that referred to an outdated version.
         </p>
@@ -1014,7 +1026,19 @@
     // Initial state setup
     document.addEventListener('DOMContentLoaded', () => {
         showPage('page1');
-    });
+        const disclaimerTemplate = document.getElementById("disclaimer-template");
+
+            if (disclaimerTemplate) {
+                document.querySelectorAll(".page").forEach(page => {
+                    const clone = disclaimerTemplate.cloneNode(true);
+                    clone.id = ""; // avoid duplicate IDs
+                    page.appendChild(clone);
+                });
+
+        // Hide the original template
+        disclaimerTemplate.style.display = "none";
+    }
+});
 
 </script>
 
